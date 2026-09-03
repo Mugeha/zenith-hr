@@ -1,0 +1,12 @@
+{$SITE_ADDRESS:http://localhost} {
+	encode gzip
+
+	@api path /api/* /uploads/*
+	handle @api {
+		reverse_proxy api:4000
+	}
+
+	handle {
+		reverse_proxy web:8081
+	}
+}

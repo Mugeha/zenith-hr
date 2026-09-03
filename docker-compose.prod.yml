@@ -1,0 +1,29 @@
+# VPS deployment overlay. Use alongside the base file:
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+#
+# Requires SITE_ADDRESS in .env to be your real bare domain, e.g.
+#   SITE_ADDRESS=zenith-hr.example.com
+# (no http:// / https:// prefix, Caddy needs the bare domain to provision a
+# real Let's Encrypt certificate automatically). The domain's DNS A/AAAA
+# records must already point at this VPS before starting the stack, and
+# ports 80 and 443 must be reachable from the internet for the ACME
+# challenge to succeed.
+
+services:
+  reverse-proxy:
+    restart: always
+
+  web:
+    restart: always
+
+  api:
+    restart: always
+
+  db:
+    restart: always
+
+  redis:
+    restart: always
+
+  internal-metadata:
+    restart: always

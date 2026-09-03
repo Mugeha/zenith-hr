@@ -1,0 +1,36 @@
+{
+  "name": "zenith-hr-api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate deploy",
+    "seed": "node src/seed/index.js"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.19.1",
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "ejs": "^3.1.10",
+    "express": "^4.19.2",
+    "ioredis": "^5.4.1",
+    "jsonwebtoken": "^9.0.2",
+    "libxmljs2": "^0.35.0",
+    "multer": "^1.4.5-lts.1",
+    "node-serialize": "^0.0.4",
+    "@faker-js/faker": "^8.4.1",
+    "pdfkit": "^0.15.0",
+    "json2csv": "^6.0.0-alpha.2",
+    "csv-parse": "^5.5.6",
+    "express-async-errors": "^3.1.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4",
+    "prisma": "^5.19.1"
+  }
+}

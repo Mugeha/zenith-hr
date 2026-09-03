@@ -1,0 +1,124 @@
+networks:
+  edge:
+  internal:
+    internal: true
+
+volumes:
+  pgdata:
+  uploads:
+  caddy_data:
+  caddy_config:
+
+services:
+  reverse-proxy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "${HTTP_PORT:-80}:80"
+      - "${HTTPS_PORT:-443}:443"
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:-http://localhost}
+    volumes:
+      - ./reverse-proxy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - edge
+      - internal
+    depends_on:
+      - web
+      - api
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 128M
+
+  web:
+    build:
+      context: ./services/web
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/cache/nginx
+      - /var/run
+    networks:
+      - internal
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 128M
+
+  api:
+    build:
+      context: ./services/api
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      JWT_SECRET: ${JWT_SECRET}
+      DATABASE_URL: postgres://${POSTGRES_USER:-zenith}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-zenith_hr}
+      REDIS_URL: redis://redis:6379
+      WEB_ORIGIN: ${SITE_ADDRESS:-http://localhost}
+      UPLOADS_DIR: /app/uploads
+    volumes:
+      - uploads:/app/uploads
+    networks:
+      - internal
+    depends_on:
+      - db
+      - redis
+      - internal-metadata
+    deploy:
+      resources:
+        limits:
+          cpus: "1.00"
+          memory: 512M
+
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-zenith}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-zenith_hr}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - internal
+    deploy:
+      resources:
+        limits:
+          cpus: "1.00"
+          memory: 512M
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    networks:
+      - internal
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 128M
+
+  internal-metadata:
+    build:
+      context: ./services/internal-metadata
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp
+    networks:
+      - internal
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 64M

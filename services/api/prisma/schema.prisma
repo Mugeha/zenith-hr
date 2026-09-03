@@ -1,0 +1,217 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  EMPLOYEE
+  MANAGER
+  HR_ADMIN
+  SUPER_ADMIN
+}
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum ExpenseStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  REIMBURSED
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+model Company {
+  id        String   @id @default(uuid())
+  name      String   @default("Zenith HR Ltd")
+  logoUrl   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model User {
+  id             String    @id @default(uuid())
+  email          String    @unique
+  passwordHash   String
+  firstName      String
+  lastName       String
+  role           Role      @default(EMPLOYEE)
+  department     String
+  jobTitle       String
+  bio            String?
+  avatarUrl      String?
+  nationalId     String
+  bankAccountNo  String
+  bankName       String
+  reimbursedTotal Int      @default(0)
+  salaryMonthly  Int
+  managerId      String?
+  manager        User?     @relation("ManagerReports", fields: [managerId], references: [id])
+  reports        User[]    @relation("ManagerReports")
+  hiredAt        DateTime  @default(now())
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  payslips            Payslip[]
+  leaveRequests       LeaveRequest[]         @relation("LeaveRequester")
+  leaveApprovals      LeaveRequest[]         @relation("LeaveApprover")
+  leaveBalance        LeaveBalance?
+  expenses            Expense[]
+  reviewsReceived     PerformanceReview[]    @relation("RevieweeUser")
+  reviewsWritten      PerformanceReview[]    @relation("ReviewerUser")
+  documents           Document[]
+  ticketsFiled        SupportTicket[]
+  ticketComments      TicketComment[]
+  savedReportConfigs  SavedReportConfig[]
+  auditLogEntries     AuditLog[]
+}
+
+model Payslip {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+  periodMonth  Int
+  periodYear   Int
+  grossPay     Int
+  deductions   Int
+  netPay       Int
+  payrollRunId String?
+  payrollRun   PayrollRun? @relation(fields: [payrollRunId], references: [id])
+  createdAt    DateTime @default(now())
+}
+
+model PayrollRun {
+  id          String    @id @default(uuid())
+  periodMonth Int
+  periodYear  Int
+  runByUserId String
+  status      String    @default("COMPLETED")
+  createdAt   DateTime  @default(now())
+  payslips    Payslip[]
+}
+
+model LeaveBalance {
+  id            String @id @default(uuid())
+  userId        String @unique
+  user          User   @relation(fields: [userId], references: [id])
+  annualDays    Int    @default(21)
+  usedDays      Int    @default(0)
+}
+
+model LeaveRequest {
+  id           String      @id @default(uuid())
+  userId       String
+  user         User        @relation("LeaveRequester", fields: [userId], references: [id])
+  startDate    DateTime
+  endDate      DateTime
+  reason       String
+  status       LeaveStatus @default(PENDING)
+  approverId   String?
+  approver     User?       @relation("LeaveApprover", fields: [approverId], references: [id])
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+model Expense {
+  id          String        @id @default(uuid())
+  userId      String
+  user        User          @relation(fields: [userId], references: [id])
+  amount      Int
+  currency    String        @default("KES")
+  description String
+  receiptPath String?
+  status      ExpenseStatus @default(PENDING)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model PerformanceReview {
+  id          String   @id @default(uuid())
+  revieweeId  String
+  reviewee    User     @relation("RevieweeUser", fields: [revieweeId], references: [id])
+  reviewerId  String
+  reviewer    User     @relation("ReviewerUser", fields: [reviewerId], references: [id])
+  cycle       String
+  content     String
+  rating      Int
+  acknowledged Boolean @default(false)
+  createdAt   DateTime @default(now())
+}
+
+model Document {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  label       String
+  storagePath String
+  mimeType    String
+  createdAt   DateTime @default(now())
+}
+
+model SupportTicket {
+  id        String         @id @default(uuid())
+  userId    String
+  user      User           @relation(fields: [userId], references: [id])
+  subject   String
+  category  String
+  status    TicketStatus   @default(OPEN)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  comments  TicketComment[]
+}
+
+model TicketComment {
+  id        String        @id @default(uuid())
+  ticketId  String
+  ticket    SupportTicket @relation(fields: [ticketId], references: [id])
+  authorId  String
+  author    User          @relation(fields: [authorId], references: [id])
+  body      String
+  createdAt DateTime      @default(now())
+}
+
+model ApiKey {
+  id        String   @id @default(uuid())
+  label     String
+  keyValue  String
+  createdAt DateTime @default(now())
+}
+
+model Webhook {
+  id        String   @id @default(uuid())
+  label     String
+  targetUrl String
+  createdAt DateTime @default(now())
+}
+
+model SavedReportConfig {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  label      String
+  serialized String
+  createdAt  DateTime @default(now())
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  action    String
+  detail    String
+  ipAddress String?
+  createdAt DateTime @default(now())
+}

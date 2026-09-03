@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.env
+services/api/uploads/*
+!services/api/uploads/.gitkeep
+*.log
+
+# Operator-only: exploit answer key and deployment/containment detail.
+# Students will clone this repo directly, so these must never be tracked.
+docs/SOLUTIONS.md
+docs/DEPLOYMENT.md
