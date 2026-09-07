@@ -17,6 +17,17 @@ full seeded dataset (~230 fake employee accounts, payroll history, leave request
 Nothing is shared with anyone else and nothing calls out to any external service, everything
 runs locally in Docker containers on your machine.
 
+## Screenshots
+
+Regular employee dashboard:
+
+![Employee dashboard](docs/screenshots/employee-dashboard.png)
+
+Super Admin dashboard (note the extra Admin Console, Reports & Search, and Support Queue links
+that only appear for admin roles):
+
+![Admin dashboard](docs/screenshots/admin-dashboard.png)
+
 ## Prerequisites
 
 - **Docker** and the **Docker Compose** plugin installed. If you don't have these yet, install
