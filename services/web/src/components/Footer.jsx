@@ -18,7 +18,7 @@ export default function Footer() {
         <a href="/rules-of-engagement" style={{ color: "var(--zh-red)" }}>
           Rules of Engagement
         </a>{" "}
-        · Program contact: security@africahackon.example
+        · Program contact: academy@africahackon.com
       </div>
     </footer>
   );

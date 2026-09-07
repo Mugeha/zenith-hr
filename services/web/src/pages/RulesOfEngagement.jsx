@@ -43,7 +43,7 @@ export default function RulesOfEngagement() {
         <p>
           For questions about scope, to report an environment issue, or to coordinate with
           program operators, contact{" "}
-          <a href="mailto:security@africahackon.example">security@africahackon.example</a>.
+          <a href="mailto:academy@africahackon.com">academy@africahackon.com</a>.
         </p>
 
         <h2>Logging</h2>

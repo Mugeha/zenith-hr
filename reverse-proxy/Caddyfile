@@ -1,4 +1,4 @@
-{$SITE_ADDRESS:http://localhost} {
+{$SITE_ADDRESS} {
 	encode gzip
 
 	@api path /api/* /uploads/*
