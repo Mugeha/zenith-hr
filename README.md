@@ -19,6 +19,10 @@ runs locally in Docker containers on your machine.
 
 ## Screenshots
 
+Marketing landing page:
+
+![Landing page](docs/screenshots/landing-page.png)
+
 Regular employee dashboard:
 
 ![Employee dashboard](docs/screenshots/employee-dashboard.png)
